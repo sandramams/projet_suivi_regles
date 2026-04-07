@@ -1,0 +1,224 @@
+/* ============================================================
+   FICHIER  : src/styles/index.css
+   RÔLE     : Variables de design globales, reset CSS, typographie,
+              utilitaires et animations réutilisables dans toute l'app.
+              Importé une seule fois dans src/index.jsx.
+   ============================================================ */
+
+/* ── VARIABLES DE DESIGN ─────────────────────────────────── */
+:root {
+  /* Palette principale */
+  --clr-plum:         #3D1A3E;   /* Couleur principale — profonde, féminine */
+  --clr-plum-light:   #6B2F6E;
+  --clr-rose:         #C2185B;   /* Accent primaire */
+  --clr-rose-light:   #E91E8C;
+  --clr-rose-pale:    #FCE4EC;
+  --clr-rose-deep:    #880E4F;
+
+  /* Couleurs de phase de cycle */
+  --clr-period:       #E91E63;   /* Règles */
+  --clr-period-bg:    #FCE4EC;
+  --clr-fertile:      #2E7D32;   /* Fenêtre fertile */
+  --clr-fertile-bg:   #E8F5E9;
+  --clr-ovulation:    #F57F17;   /* Ovulation */
+  --clr-ovulation-bg: #FFF8E1;
+  --clr-predicted:    #7B1FA2;   /* Prédiction */
+  --clr-predicted-bg: #F3E5F5;
+  --clr-luteal:       #5C6BC0;   /* Phase lutéale */
+  --clr-luteal-bg:    #E8EAF6;
+
+  /* Fond et surfaces */
+  --clr-bg:           #FFF8F2;   /* Fond crème chaud */
+  --clr-surface:      #FFFFFF;
+  --clr-surface-2:    #FDF5F0;
+
+  /* Texte */
+  --clr-text:         #2D1428;   /* Texte principal — teinte prune */
+  --clr-text-muted:   #8A6A8E;
+  --clr-text-hint:    #C4A8C6;
+
+  /* Bordures */
+  --clr-border:       rgba(194,24,91,.1);
+  --clr-border-hover: rgba(194,24,91,.22);
+
+  /* Statuts */
+  --clr-success:      #2E7D32;
+  --clr-success-bg:   #E8F5E9;
+  --clr-warning:      #F57F17;
+  --clr-warning-bg:   #FFF8E1;
+  --clr-error:        #C62828;
+  --clr-error-bg:     #FFEBEE;
+
+  /* Typographie */
+  --font-display:     'Cormorant Garamond', Georgia, serif;  /* Titres élégants */
+  --font-body:        'DM Sans', -apple-system, sans-serif;  /* Corps de texte */
+
+  /* Ombres */
+  --shadow-xs:        0 1px 4px rgba(61,26,62,.06);
+  --shadow-sm:        0 2px 12px rgba(61,26,62,.08);
+  --shadow-md:        0 6px 24px rgba(61,26,62,.12);
+  --shadow-lg:        0 16px 48px rgba(61,26,62,.18);
+  --shadow-rose:      0 6px 20px rgba(194,24,91,.3);
+
+  /* Rayons */
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  18px;
+  --r-xl:  24px;
+  --r-2xl: 32px;
+
+  /* Transitions */
+  --ease:       cubic-bezier(.4,0,.2,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+
+  /* Layout */
+  --sidebar-width: 258px;
+  --topbar-height: 62px;
+}
+
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Supprime les styles par défaut des boutons et liens */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+a { text-decoration: none; color: inherit; }
+ul, ol { list-style: none; }
+img { max-width: 100%; display: block; }
+
+/* Scrollbar personnalisée (navigateurs Webkit) */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--clr-rose-pale);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--clr-rose-light); }
+
+/* ── UTILITAIRES ──────────────────────────────────────────── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); border: 0;
+}
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── ANIMATIONS GLOBALES ──────────────────────────────────── */
+
+/* Apparition en fondu + glissement vers le haut */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Apparition en fondu simple */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Glissement depuis la gauche (sidebar mobile) */
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Pulsation douce (indicateur phase active) */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .6; transform: scale(.88); }
+}
+
+/* Rotation (spinner de chargement) */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Shimmer (skeleton loading) */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* Classes d'animation réutilisables */
+.animate-fadeInUp  { animation: fadeInUp  .35s var(--ease) both; }
+.animate-fadeIn    { animation: fadeIn    .25s var(--ease) both; }
+.animate-pulse     { animation: pulse     2s ease-in-out infinite; }
+.animate-spin      { animation: spin      .8s linear infinite; }
+
+/* Délais d'animation pour les effets en cascade */
+.delay-1  { animation-delay: .05s; }
+.delay-2  { animation-delay: .10s; }
+.delay-3  { animation-delay: .15s; }
+.delay-4  { animation-delay: .20s; }
+.delay-5  { animation-delay: .25s; }
+
+/* ── SKELETON LOADING ─────────────────────────────────────── */
+/* Utilisé dans les composants pendant le chargement des données */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--clr-rose-pale) 25%,
+    #fff5f8 50%,
+    var(--clr-rose-pale) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-sm);
+}
+
+/* ── TYPOGRAPHIE ──────────────────────────────────────────── */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--clr-plum);
+}
+h1 { font-size: clamp(24px, 3vw, 32px); }
+h2 { font-size: clamp(20px, 2.5vw, 26px); }
+h3 { font-size: clamp(17px, 2vw, 20px); }
+
+/* ── REACT HOT TOAST (surcharge du style par défaut) ─────── */
+/* Personnalise les toasts pour correspondre à la charte graphique */
+[data-hot-toast] {
+  font-family: var(--font-body) !important;
+  font-size: 13.5px !important;
+  border-radius: var(--r-md) !important;
+}
+
+/* ── CLASSES DE PHASE DE CYCLE ────────────────────────────── */
+/* Réutilisées dans le calendrier et le tableau de bord */
+.phase-period     { color: var(--clr-period);    background: var(--clr-period-bg); }
+.phase-fertile    { color: var(--clr-fertile);   background: var(--clr-fertile-bg); }
+.phase-ovulation  { color: var(--clr-ovulation); background: var(--clr-ovulation-bg); }
+.phase-predicted  { color: var(--clr-predicted); background: var(--clr-predicted-bg); }
+.phase-luteal     { color: var(--clr-luteal);    background: var(--clr-luteal-bg); }
