@@ -1,99 +1,65 @@
 // ============================================================
 // FICHIER  : src/hooks/useCycles.js
-// RÔLE     : Hook React personnalisé pour gérer les cycles.
-//            Encapsule le chargement, la création, la modification
-//            et la suppression des cycles avec gestion d'état locale.
-//
-// UTILISATION :
-//   const { cycles, loading, createCycle, refetch } = useCycles();
+// RÔLE     : Hooks pour la gestion des cycles (CRUD + dashboard).
+//            Encapsule les appels API avec gestion d'état locale.
+// → Chemin dans le projet : src/hooks/useCycles.js
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import * as cycleService from '../services/cycleService';
 
+// ── useCycles : liste + CRUD ─────────────────────────────────
 export function useCycles(autoFetch = true) {
-  const [cycles, setCycles]       = useState([]);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState(null);
+  const [cycles, setCycles]         = useState([]);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState(null);
   const [pagination, setPagination] = useState(null);
 
-  // ── CHARGER LES CYCLES ──────────────────────────────────────
   const fetchCycles = useCallback(async (page = 1, limit = 12) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const result = await cycleService.getCycles(page, limit);
-      setCycles(result.cycles);
-      setPagination(result.pagination);
-    } catch (err) {
-      setError(err.userMessage || 'Erreur de chargement');
-    } finally {
-      setLoading(false);
-    }
+      const r = await cycleService.getCycles(page, limit);
+      setCycles(r.cycles);
+      setPagination(r.pagination);
+    } catch (e) { setError(e.userMessage || 'Erreur de chargement'); }
+    finally { setLoading(false); }
   }, []);
 
-  // Charge automatiquement au montage si autoFetch = true
-  useEffect(() => {
-    if (autoFetch) fetchCycles();
-  }, [autoFetch, fetchCycles]);
+  useEffect(() => { if (autoFetch) fetchCycles(); }, [autoFetch, fetchCycles]);
 
-  // ── CRÉER UN CYCLE ──────────────────────────────────────────
-  const createCycle = useCallback(async (cycleData) => {
+  const createCycle = useCallback(async (data) => {
     setLoading(true);
     try {
-      const newCycle = await cycleService.createCycle(cycleData);
-      // Ajoute le nouveau cycle en tête de liste
-      setCycles(prev => [newCycle, ...prev]);
+      const c = await cycleService.createCycle(data);
+      setCycles(p => [c, ...p]);
       toast.success('Cycle enregistré ! Prédictions mises à jour. 🌸');
-      return newCycle;
-    } catch (err) {
-      toast.error(err.userMessage || 'Erreur lors de l\'enregistrement');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+      return c;
+    } catch (e) { toast.error(e.userMessage || 'Erreur'); throw e; }
+    finally { setLoading(false); }
   }, []);
 
-  // ── MODIFIER UN CYCLE ───────────────────────────────────────
   const updateCycle = useCallback(async (id, updates) => {
     try {
-      const updated = await cycleService.updateCycle(id, updates);
-      setCycles(prev => prev.map(c => c.id === id ? updated : c));
+      const u = await cycleService.updateCycle(id, updates);
+      setCycles(p => p.map(c => c.id === id ? u : c));
       toast.success('Cycle mis à jour.');
-      return updated;
-    } catch (err) {
-      toast.error(err.userMessage || 'Erreur lors de la mise à jour');
-      throw err;
-    }
+      return u;
+    } catch (e) { toast.error(e.userMessage || 'Erreur'); throw e; }
   }, []);
 
-  // ── SUPPRIMER UN CYCLE ──────────────────────────────────────
   const deleteCycle = useCallback(async (id) => {
     try {
       await cycleService.deleteCycle(id);
-      setCycles(prev => prev.filter(c => c.id !== id));
+      setCycles(p => p.filter(c => c.id !== id));
       toast.success('Cycle supprimé.');
-    } catch (err) {
-      toast.error(err.userMessage || 'Erreur lors de la suppression');
-      throw err;
-    }
+    } catch (e) { toast.error(e.userMessage || 'Erreur'); throw e; }
   }, []);
 
-  return {
-    cycles,
-    loading,
-    error,
-    pagination,
-    createCycle,
-    updateCycle,
-    deleteCycle,
-    refetch: fetchCycles,
-  };
+  return { cycles, loading, error, pagination, createCycle, updateCycle, deleteCycle, refetch: fetchCycles };
 }
 
-// ── HOOK TABLEAU DE BORD ────────────────────────────────────
-// Hook séparé pour les données du dashboard (chargement unique)
+// ── useDashboard : données du tableau de bord ────────────────
 export function useDashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading]     = useState(true);
@@ -101,22 +67,16 @@ export function useDashboard() {
 
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
-    try {
-      const data = await cycleService.getDashboard();
-      setDashboard(data);
-    } catch (err) {
-      setError(err.userMessage);
-    } finally {
-      setLoading(false);
-    }
+    try { setDashboard(await cycleService.getDashboard()); }
+    catch (e) { setError(e.userMessage); }
+    finally { setLoading(false); }
   }, []);
 
   useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
-
   return { dashboard, loading, error, refetch: fetchDashboard };
 }
 
-// ── HOOK PRÉDICTIONS ────────────────────────────────────────
+// ── usePredictions : prédictions des prochains cycles ────────
 export function usePredictions() {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading]         = useState(true);
